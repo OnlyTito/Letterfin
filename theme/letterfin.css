@@ -1,0 +1,974 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap");
+
+/* ==========================================================================
+   LETTERFIN — a simple Jellyfin 12.0 theme (Modern layout)
+   --------------------------------------------------------------------------
+   Letterfin is an independent, unofficial theme with a dark, cinematic look.
+   It is not affiliated with, endorsed by, or connected to Letterboxd.
+
+   Install: Dashboard > General > Custom CSS code (all users), or
+   User settings > Display > Custom CSS code (just you).
+   Use the built-in "Dark" theme and the "Modern" layout.
+   Selectors were checked against the jellyfin-web v12.0 source code.
+
+   Index
+     0. Fonts (external, with system fallback)
+     1. Tokens (own variables + native --jf-palette-* palette)
+     2. Global base
+     3. Header, navigation and tabs
+     4. Editorial section titles
+     5. Cards / posters
+     6. Libraries
+     7. Details page
+     8. Player (OSD)
+     9. Menus, dialogs and buttons
+    10. Responsiveness
+    11. Login screen
+   ========================================================================== */
+
+/* 0. FONTS ------------------------------------------------------------------
+   The display font (Fraunces) is loaded from Google Fonts by the @import on
+   the first line of this file. If it cannot be loaded (offline server, blocked
+   request, etc.), the browser falls back to the system serif fonts listed in
+   --lf-font-display below. Nothing breaks. */
+
+/* 1. TOKENS ---------------------------------------------------------------- */
+:root {
+  /* Surfaces (graphite → blue-gray) */
+  --lf-bg:            #14181c;
+  --lf-surface-1:     #1b2229;
+  --lf-surface-2:     #242d36;
+  --lf-border:        #2c3640;
+  --lf-border-soft:   rgba(255, 255, 255, 0.07);
+
+  /* Text */
+  --lf-text:          #e6ebef;
+  --lf-text-muted:    #9ab;
+  --lf-text-faint:    #678;
+
+  /* Accents: green is the main one; blue and orange used sparingly */
+  --lf-green:         #00e054;
+  --lf-green-dim:     #00b845;
+  --lf-green-ink:     #06210f;
+  --lf-blue:          #40bcf4;
+  --lf-orange:        #ff8000;
+
+  /* Spacing */
+  --lf-gap-1: 0.5rem;
+  --lf-gap-2: 1rem;
+  --lf-gap-3: 1.5rem;
+  --lf-gutter: clamp(1rem, 4vw, 3rem);
+
+  /* Borders and shadows */
+  --lf-radius:        4px;
+  --lf-radius-pill:   999px;
+  --lf-shadow:        0 4px 16px rgba(0, 0, 0, 0.35);
+
+  /* Typography (external font first, system fonts as fallback) */
+  --lf-font-body:     "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --lf-font-display:  "Fraunces", "Iowan Old Style", "Palatino Linotype", Charter, Georgia, serif;
+
+  /* Native Jellyfin variable for the card border radius */
+  --jf-card-borderRadius: var(--lf-radius);
+}
+
+/* Native Jellyfin 12 palette (MUI, "jf" prefix, scoped to [data-theme]).
+   html[data-theme] has higher specificity than [data-theme="dark"]. */
+html[data-theme] {
+  --jf-palette-primary-main:          var(--lf-green);
+  --jf-palette-primary-dark:          var(--lf-green-dim);
+  --jf-palette-primary-light:         #4dff8a;
+  --jf-palette-primary-contrastText:  var(--lf-green-ink);
+  --jf-palette-secondary-main:        var(--lf-green);
+  --jf-palette-secondary-contrastText: var(--lf-green-ink);
+  --jf-palette-background-default:    var(--lf-bg);
+  --jf-palette-background-paper:      var(--lf-surface-1);
+  --jf-palette-text-primary:          var(--lf-text);
+  --jf-palette-text-secondary:        var(--lf-text-muted);
+  --jf-palette-divider:               var(--lf-border-soft);
+  --jf-palette-AppBar-defaultBg:      var(--lf-bg);
+  --jf-palette-AppBar-transparentBg:  rgba(20, 24, 28, 0.6);
+  --jf-palette-AppBar-gradient:       none;
+  --jf-palette-FilledInput-bg:        var(--lf-surface-2);
+  --jf-palette-FilledInput-borderColor: var(--lf-border);
+  --jf-palette-action-hover:          rgba(255, 255, 255, 0.06);
+  --jf-palette-action-focus:          rgba(0, 224, 84, 0.18);
+  --jf-palette-background-defaultImage: none;
+}
+
+/* 2. GLOBAL BASE ----------------------------------------------------------- */
+html,
+.backgroundContainer {
+  background-color: var(--lf-bg);
+  background-image: none;
+}
+
+body {
+  font-family: var(--lf-font-body);
+  color: var(--lf-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  scrollbar-color: var(--lf-border) var(--lf-bg);
+}
+
+a { color: inherit; }
+
+/* 3. HEADER, NAVIGATION AND TABS ------------------------------------------- */
+.MuiAppBar-root {
+  background-color: var(--lf-bg);
+  background-image: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--lf-border-soft);
+}
+
+/* Transparent header over the backdrop (details page) */
+.MuiAppBar-root.MuiAppBar-colorTransparent {
+  background-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.MuiDrawer-paper {
+  background-color: var(--lf-surface-1);
+  border-right: 1px solid var(--lf-border-soft);
+}
+
+/* Highlight the current page: Jellyfin marks the active item with
+   color="primary" (MuiButton-colorPrimary) and the others with "inherit". */
+.MuiToolbar-root .MuiButton-text {
+  position: relative;
+  border-radius: var(--lf-radius);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.MuiToolbar-root .MuiButton-text.MuiButton-colorInherit {
+  color: var(--lf-text-faint);
+}
+
+.MuiToolbar-root .MuiButton-text.MuiButton-colorInherit:hover {
+  color: var(--lf-text);
+  background-color: var(--jf-palette-action-hover);
+}
+
+.MuiToolbar-root .MuiButton-text.MuiButton-colorPrimary {
+  color: var(--lf-text);
+  font-weight: 700;
+  background-color: rgba(0, 224, 84, 0.1);
+}
+
+.MuiToolbar-root .MuiButton-text.MuiButton-colorPrimary .MuiButton-startIcon {
+  color: var(--lf-green);
+}
+
+.MuiToolbar-root .MuiButton-text.MuiButton-colorPrimary::after {
+  content: "";
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--lf-green);
+}
+
+/* Library tabs: green underline style */
+.MuiTabs-root .MuiTab-root {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--lf-text-muted);
+}
+
+.MuiTabs-root .MuiTab-root.Mui-selected {
+  color: var(--lf-text);
+}
+
+.MuiTabs-indicator {
+  height: 2px;
+  background-color: var(--lf-green);
+}
+
+/* Desktop top navigation: floating, transparent bar with a soft top scrim,
+   uppercase letter-spaced items and an underline that reveals on hover.
+   The current page keeps the green underline. Desktop only (.layout-desktop). */
+.layout-desktop .MuiAppBar-root,
+.layout-desktop .MuiAppBar-root.MuiAppBar-colorTransparent {
+  background-color: transparent;
+  background-image: none;
+  border-bottom: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.layout-desktop .MuiAppBar-root::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 168px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(20, 24, 28, 0.78) 0%,
+    rgba(20, 24, 28, 0.45) 42%,
+    rgba(20, 24, 28, 0) 100%
+  );
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type {
+  position: relative;
+  min-height: 64px;
+  gap: 0.5em;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiStack-root {
+  gap: 1.5em;
+}
+
+/* Nav items */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root {
+  position: relative;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 0.82em;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(230, 235, 239, 0.62);
+  background-color: transparent;
+  border-radius: var(--lf-radius-pill);
+  text-shadow: 0 1px 10px rgba(20, 24, 28, 0.55);
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root:hover {
+  color: var(--lf-text);
+  background-color: transparent;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-startIcon {
+  margin-right: 0.5em;
+  opacity: 0.85;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root:hover .MuiButton-startIcon {
+  opacity: 1;
+}
+
+/* Underline: hidden by default, revealed on hover (green) */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root::after {
+  content: "";
+  position: absolute;
+  left: 0.7em;
+  right: 0.7em;
+  bottom: 0.25em;
+  height: 2px;
+  border-radius: var(--lf-radius-pill);
+  background: var(--lf-green);
+  opacity: 0;
+  transform: scaleX(0.6);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Current page: bright text, green icon and permanent green underline */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-text.MuiButton-colorPrimary {
+  color: var(--lf-text);
+  font-weight: 700;
+  background-color: transparent;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-text.MuiButton-colorPrimary .MuiButton-startIcon {
+  color: var(--lf-green);
+  opacity: 1;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-text.MuiButton-colorPrimary::after {
+  opacity: 1;
+  transform: scaleX(1);
+  left: 0.7em;
+  right: 0.7em;
+  bottom: 0.25em;
+  height: 2px;
+  border-radius: var(--lf-radius-pill);
+  background: var(--lf-green);
+}
+
+/* Server / logo button (large): bolder, always bright, no underline */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-sizeLarge {
+  font-size: 0.88em;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--lf-text);
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-sizeLarge::after {
+  content: none;
+}
+
+/* Icon buttons (search, cast, SyncPlay) */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiIconButton-root {
+  padding: 0.55rem;
+  color: rgba(230, 235, 239, 0.62);
+  filter: drop-shadow(0 1px 8px rgba(20, 24, 28, 0.5));
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiIconButton-root .MuiSvgIcon-root {
+  font-size: 20px;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiIconButton-root:hover {
+  color: var(--lf-text);
+  background-color: rgba(0, 224, 84, 0.12);
+}
+
+/* User avatar: outlined circle */
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiAvatar-root {
+  width: 1.9rem;
+  height: 1.9rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(230, 235, 239, 0.62);
+  background-color: transparent;
+  border: 1px solid rgba(154, 170, 187, 0.32);
+  transition: color 0.16s ease, border-color 0.16s ease;
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiIconButton-root:hover .MuiAvatar-root {
+  color: var(--lf-text);
+  border-color: rgba(154, 170, 187, 0.6);
+}
+
+.layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiBadge-badge {
+  background-color: var(--lf-green);
+  color: var(--lf-green-ink);
+}
+
+/* Narrow desktop windows: tighter spacing so the items still fit */
+@media (max-width: 68em) {
+  .layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiStack-root {
+    gap: 0.35em;
+    min-width: 0;
+  }
+
+  .layout-desktop .MuiAppBar-root > .MuiToolbar-root:first-of-type .MuiButton-root {
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+}
+
+/* 4. EDITORIAL SECTION TITLES ---------------------------------------------- */
+.sectionTitle,
+.sectionTitle-cards {
+  font-family: var(--lf-font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lf-text-muted);
+}
+
+.sectionTitleContainer-cards,
+.verticalSection > .sectionTitleContainer {
+  border-bottom: 1px solid var(--lf-border);
+  padding-bottom: 0.4rem;
+  margin-bottom: var(--lf-gap-2);
+}
+
+.sectionTitleButton,
+.sectionTitleIconButton {
+  color: var(--lf-text-faint);
+}
+
+.sectionTitleButton:hover,
+.sectionTitleIconButton:hover {
+  color: var(--lf-green);
+}
+
+/* 5. CARDS / POSTERS ------------------------------------------------------- */
+/* Aspect ratios are controlled by Jellyfin's .cardPadder-* classes: do not change. */
+.cardImageContainer,
+.cardContent,
+.cardOverlayContainer {
+  border-radius: var(--lf-radius);
+}
+
+.defaultCardBackground,
+.textCardImageContainer {
+  background-color: var(--lf-surface-2);
+}
+
+/* Poster ring drawn INSIDE the poster (inset pseudo-element). Jellyfin removes
+   the left margin of the first card (.itemsContainer > .card > .cardBox) and
+   .card uses contain: paint, so an outer ring would be clipped on the left. */
+.cardScalable::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--lf-radius);
+  box-shadow: inset 0 0 0 1px var(--lf-border-soft);
+  pointer-events: none;
+  transition: box-shadow 0.18s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .cardScalable::after {
+    box-shadow: inset 0 0 0 2px var(--lf-green);
+  }
+}
+
+.card:focus-visible .cardScalable::after {
+  box-shadow: inset 0 0 0 2px var(--lf-green);
+}
+
+/* Hover overlay: slightly darkened, green Play button */
+.cardOverlayContainer {
+  background: rgba(20, 24, 28, 0.55);
+}
+
+.cardOverlayContainer > .cardOverlayFab-primary {
+  background-color: var(--lf-green);
+  color: var(--lf-green-ink);
+  box-shadow: var(--lf-shadow);
+}
+
+/* Card text */
+.cardText {
+  font-size: 0.85em;
+  color: var(--lf-text-muted);
+}
+
+.cardText-first,
+.cardText-first > .textActionButton {
+  color: var(--lf-text);
+  font-weight: 600;
+}
+
+/* Indicators: watched (green check), count, progress */
+.playedIndicator,
+.countIndicator {
+  background: var(--lf-green);
+  color: var(--lf-green-ink);
+  box-shadow: none;
+}
+
+.videoIndicator {
+  background: rgba(20, 24, 28, 0.8);
+  box-shadow: none;
+}
+
+.itemProgressBar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.itemProgressBarForeground {
+  background: var(--lf-green);
+}
+
+.missingIndicator,
+.unairedIndicator {
+  background: var(--lf-orange);
+  color: #1a0d00;
+}
+
+/* 6. LIBRARIES ------------------------------------------------------------- */
+/* The sticky header and the filter/sort bar are MUI components inside
+   .MuiAppBar-root (already styled in section 3). */
+.libraryPage:not(.itemDetailPage) .itemsContainer.vertical-wrap {
+  gap: 0.25rem 0;
+}
+
+.MuiToolbar-root .MuiButton-root,
+.MuiToolbar-root .MuiIconButton-root {
+  color: var(--lf-text-muted);
+}
+
+.MuiToolbar-root .MuiButton-root:hover,
+.MuiToolbar-root .MuiIconButton-root:hover {
+  color: var(--lf-text);
+  background-color: var(--jf-palette-action-hover);
+}
+
+/* 7. DETAILS PAGE ---------------------------------------------------------- */
+/* Wide, clear backdrop with only a soft fade-in into the page background at
+   the bottom (uses ::after; Jellyfin uses ::before on the mobile layout, so
+   there is no conflict). */
+.itemDetailPage .itemBackdrop {
+  height: 62vh;
+  min-height: 22rem;
+}
+
+.itemDetailPage .itemBackdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    var(--lf-bg) 0%,
+    rgba(20, 24, 28, 0.35) 20%,
+    rgba(20, 24, 28, 0) 45%
+  );
+  pointer-events: none;
+}
+
+.detailRibbon {
+  background: none;
+  background-color: transparent;
+}
+
+/* Featured poster */
+.detailImageContainer .card .cardScalable,
+.itemDetailImage {
+  border-radius: var(--lf-radius);
+  box-shadow: 0 0 0 1px var(--lf-border-soft), 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+/* Smaller poster (Jellyfin default: 25vw). The text indent follows the
+   reduction (32.45vw -> 27.45vw) to keep the same gap between poster and title. */
+.layout-desktop .detailImageContainer .card {
+  max-width: 20vw;
+}
+
+[dir="ltr"] .detailPagePrimaryContent {
+  padding-left: 27.45vw;
+}
+
+[dir="rtl"] .detailPagePrimaryContent {
+  padding-right: 27.45vw;
+}
+
+.layout-desktop [dir="ltr"] .detailRibbon {
+  padding-left: 27.45vw;
+}
+
+.layout-desktop [dir="rtl"] .detailRibbon {
+  padding-right: 27.45vw;
+}
+
+.layout-mobile .detailImageContainer .card {
+  max-width: 24vw;
+}
+
+/* Expressive title */
+.itemDetailPage .itemName {
+  font-family: var(--lf-font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: var(--lf-text);
+}
+
+.itemDetailPage h1.itemName {
+  font-size: clamp(1.9rem, 4.2vw, 3.2rem);
+}
+
+.itemDetailPage .itemName.originalTitle,
+.itemDetailPage .tagline {
+  font-family: var(--lf-font-display);
+  font-style: italic;
+  color: var(--lf-text-muted);
+}
+
+/* Year · runtime · rating */
+.itemDetailPage .itemMiscInfo {
+  color: var(--lf-text-muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+
+.itemDetailPage .itemMiscInfo .mediaInfoItem {
+  background: none;
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius);
+  padding: 0 0.45em;
+  color: var(--lf-text-muted);
+}
+
+/* Overview with a comfortable reading width */
+.itemDetailPage .overview,
+.itemDetailPage .itemOverview {
+  max-width: 62ch;
+  line-height: 1.65;
+  font-size: 1.02rem;
+  color: var(--lf-text);
+}
+
+/* Genres, tags, external links */
+.itemDetailPage .itemGenres a,
+.itemDetailPage .itemTags a,
+.itemDetailPage .itemExternalLinks a {
+  color: var(--lf-text-muted);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--lf-border);
+}
+
+.itemDetailPage .itemGenres a:hover,
+.itemDetailPage .itemTags a:hover,
+.itemDetailPage .itemExternalLinks a:hover {
+  color: var(--lf-green);
+  border-bottom-color: var(--lf-green);
+}
+
+/* Action buttons: Play stands out, the rest stay subtle */
+.itemDetailPage .mainDetailButtons .btnPlay {
+  background-color: var(--lf-green);
+  color: var(--lf-green-ink);
+  border-radius: var(--lf-radius);
+  font-weight: 700;
+}
+
+.itemDetailPage .mainDetailButtons .btnPlay:hover {
+  background-color: #4dff8a;
+}
+
+.itemDetailPage .mainDetailButtons .detailButton:not(.btnPlay) {
+  color: var(--lf-text-muted);
+}
+
+.itemDetailPage .mainDetailButtons .detailButton:not(.btnPlay):hover {
+  color: var(--lf-text);
+}
+
+/* "Add to favorites" heart: orange only when the item IS a favorite.
+   Jellyfin adds .ratingbutton-icon-withrating to the icon in that state. */
+.itemDetailPage .detailButton-icon.favorite.ratingbutton-icon-withrating {
+  color: var(--lf-orange);
+}
+
+/* Audio/subtitle selection */
+.itemDetailPage .selectContainer .detailTrackSelect {
+  background-color: var(--lf-surface-2);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius);
+  color: var(--lf-text);
+}
+
+/* "Next Up" episode thumbs: Jellyfin sizes them as a share of the viewport
+   (up to 30vw), which makes them huge. Cap the size instead. */
+.nextUpItems > .overflowBackdropCard {
+  width: clamp(11rem, 17vw, 18rem);
+}
+
+/* "Next Up" heading: keep it a small heading in normal flow, above the cards.
+   High specificity on purpose, so it also wins over other custom CSS or plugins
+   that might enlarge it or move it over the thumbnails. */
+.itemDetailPage .nextUpSection > h2.sectionTitle.sectionTitle-cards {
+  position: static;
+  display: block;
+  margin: 0 0 var(--lf-gap-1);
+  padding: 1.25em 0 0.4em;
+  font-family: var(--lf-font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.14em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--lf-text-muted);
+}
+
+.itemDetailPage .nextUpSection > .nextUpItems {
+  position: relative;
+  z-index: 0;
+  margin-top: 0;
+}
+
+/* Cast, seasons, episodes and recommendations inherit card styles (section 5) */
+.itemDetailPage .detailSection .sectionTitle {
+  color: var(--lf-text-muted);
+}
+
+/* 8. PLAYER (OSD) ---------------------------------------------------------- */
+/* Appearance only; the playback engine is not touched. */
+.videoOsdBottom {
+  background: linear-gradient(0deg, rgba(20, 24, 28, 0.92) 0%, rgba(20, 24, 28, 0) 100%);
+}
+
+.osdTitle {
+  font-family: var(--lf-font-display);
+  font-weight: 700;
+}
+
+.osdTimeText,
+.osdSecondaryMediaInfo,
+.endsAtText {
+  color: var(--lf-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.videoOsdBottom .mdl-slider-background-lower {
+  background-color: var(--lf-green);
+}
+
+.videoOsdBottom .mdl-slider-background-upper {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.videoOsdBottom .xlargePaperIconButton {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .videoOsdBottom .xlargePaperIconButton:hover {
+    color: var(--lf-green);
+  }
+}
+
+/* 9. MENUS, DIALOGS AND BUTTONS -------------------------------------------- */
+.MuiMenu-paper,
+.MuiPopover-paper,
+.MuiDialog-paper {
+  background-color: var(--lf-surface-1);
+  background-image: none;
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius);
+  box-shadow: var(--lf-shadow);
+}
+
+.MuiMenuItem-root.Mui-selected {
+  background-color: rgba(0, 224, 84, 0.12);
+}
+
+.MuiButton-root {
+  border-radius: var(--lf-radius);
+  box-shadow: none;
+}
+
+.MuiButton-containedInherit {
+  background-color: var(--lf-surface-2);
+  color: var(--lf-text);
+}
+
+.MuiButton-containedInherit:hover {
+  background-color: var(--lf-border);
+}
+
+.MuiFilledInput-root,
+.MuiOutlinedInput-root {
+  border-radius: var(--lf-radius);
+}
+
+/* 10. RESPONSIVENESS ------------------------------------------------------- */
+/* Tablet */
+@media (max-width: 900px) {
+  .itemDetailPage .itemBackdrop {
+    height: 48vh;
+  }
+
+  .itemDetailPage .overview,
+  .itemDetailPage .itemOverview {
+    max-width: none;
+  }
+}
+
+/* Smartphone */
+@media (max-width: 600px) {
+  .itemDetailPage .itemBackdrop {
+    height: 38vh;
+    min-height: 15rem;
+  }
+
+  .itemDetailPage h1.itemName {
+    font-size: 1.7rem;
+  }
+
+  .sectionTitle,
+  .sectionTitle-cards {
+    letter-spacing: 0.1em;
+  }
+
+  .itemDetailPage .itemMiscInfo {
+    font-size: 0.82rem;
+  }
+
+  .videoOsdBottom {
+    background: linear-gradient(0deg, rgba(20, 24, 28, 0.96) 0%, rgba(20, 24, 28, 0) 100%);
+  }
+}
+
+/* Wide screens */
+@media (min-width: 1536px) {
+  .itemDetailPage .itemBackdrop {
+    height: 68vh;
+  }
+}
+
+/* Reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .cardScalable::after,
+  .cardOverlayContainer {
+    transition: none;
+  }
+}
+
+/* 11. LOGIN SCREEN --------------------------------------------------------- */
+/* A centered dark panel over the dimmed backdrop, uppercase field labels above
+   light inputs and a full-width green button (sign-in dialog style). */
+#loginPage > .margin-auto-y {
+  width: calc(100% - 2rem);
+  max-width: 26rem;
+  margin: 5vh auto 2rem;
+  padding: 1.75rem 1.75rem 1.25rem;
+  background: #2c3440;
+  border-radius: var(--lf-radius);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.55);
+}
+
+/* Title */
+#loginPage .manualLoginForm > div:first-child {
+  justify-content: flex-start;
+  padding: 0;
+}
+
+#loginPage .manualLoginForm .sectionTitle,
+#loginPage .visualLoginForm > h1 {
+  margin: 0 0 1.25rem;
+  font-family: var(--lf-font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: left;
+  color: var(--lf-text-muted);
+}
+
+#loginPage .visualLoginForm {
+  text-align: left !important;
+}
+
+/* Fields: small uppercase label above a light input */
+#loginPage .inputContainer {
+  margin-bottom: 1.1rem;
+}
+
+#loginPage .inputLabel,
+#loginPage .inputLabelUnfocused,
+#loginPage .inputLabelFocused {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lf-text-muted);
+}
+
+#loginPage .inputLabelFocused {
+  color: var(--lf-text);
+}
+
+#loginPage .emby-input {
+  padding: 0.55em 0.7em;
+  font-size: 1rem;
+  color: var(--lf-bg);
+  background: #c8d4e0;
+  border: 0;
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+#loginPage .emby-input:focus {
+  background: #fff;
+  border: 0;
+}
+
+/* Keep the light field color when the browser autofills */
+#loginPage .emby-input:-webkit-autofill,
+#loginPage .emby-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--lf-bg);
+  box-shadow: 0 0 0 100px #c8d4e0 inset;
+}
+
+/* Remember me */
+#loginPage .checkboxContainer {
+  margin: 0.25rem 0 1.1rem;
+}
+
+#loginPage .checkboxContainer span:not(.checkboxOutline):not(.checkboxIcon) {
+  font-size: 0.85rem;
+  color: var(--lf-text-muted);
+}
+
+#loginPage .emby-checkbox:checked + span + .checkboxOutline {
+  background-color: var(--lf-green);
+  border-color: var(--lf-green);
+}
+
+#loginPage .emby-checkbox:checked + span + .checkboxOutline .checkboxIcon {
+  color: var(--lf-green-ink);
+}
+
+/* Sign in: full-width green button */
+#loginPage .button-submit {
+  margin: 0.25rem 0 0;
+  padding: 0.85em 1em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lf-green-ink);
+  background: var(--lf-green);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+#loginPage .button-submit:hover,
+#loginPage .button-submit:focus {
+  color: var(--lf-green-ink);
+  background: #4dff8a;
+}
+
+/* Secondary actions become quiet text links */
+#loginPage .raised.cancel,
+#loginPage .btnSelectServer {
+  padding: 0.5em 0.25em;
+  font-size: 0.8rem;
+  text-transform: none;
+  color: var(--lf-text-muted);
+  background: none;
+  box-shadow: none;
+}
+
+#loginPage .raised.cancel:hover,
+#loginPage .raised.cancel:focus,
+#loginPage .btnSelectServer:hover,
+#loginPage .btnSelectServer:focus {
+  color: var(--lf-text);
+  background: none;
+  text-decoration: underline;
+}
+
+#loginPage .manualLoginForm .btnCancel {
+  margin-top: 0.25rem;
+}
+
+#loginPage .readOnlyContent {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--lf-border);
+}
+
+#loginPage .loginDisclaimerContainer {
+  margin-top: 1rem;
+  color: var(--lf-text-faint);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+  #loginPage > .margin-auto-y {
+    margin-top: 2vh;
+    padding: 1.4rem 1.25rem 1rem;
+  }
+}

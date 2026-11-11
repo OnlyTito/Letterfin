@@ -1,0 +1,188 @@
+/* ==========================================================================
+   LETTERFIN — Media Bar compatibility (optional)
+   Plugin: IAmParadox27/jellyfin-plugin-media-bar (Jellyfin 12 support)
+   --------------------------------------------------------------------------
+   A CSS-only theme cannot fetch library items or run a slideshow, so this
+   file only restyles the Media Bar plugin to match Letterfin. It does not
+   modify the plugin or letterfin.css.
+
+   Install:
+     1. Install the Media Bar plugin from the plugin catalog (it requires the
+        "File Transformation" plugin), restart Jellyfin and hard-refresh (Ctrl+F5).
+     2. Import this file in Custom CSS AFTER letterfin.css.
+
+   Every rule is prefixed with #slides-container (the plugin's container),
+   because its class names (.slide, .dot, .arrow, .genre...) are generic.
+   Uses the --lf-* tokens from letterfin.css, with fallback values.
+   Selectors checked against the plugin's slideshowpure.css.
+   Letterfin is not affiliated with Letterboxd.
+   ========================================================================== */
+
+/* Compact size ---------------------------------------------------------------
+   By default the plugin makes the slideshow 100vh tall and lets the bottom of it
+   sit behind the home sections. Here it only occupies the top ~70% of the screen
+   and the home sections start right below it.
+
+   --slideshow-height      total height of the slideshow
+   --slideshow-content-top where the home sections start (keep it equal to the
+                           height so the slide text stays inside the slideshow)
+
+   Change both values together to resize it (e.g. 60vh = smaller, 80vh = bigger).
+   html:root is used so this also wins over the plugin's small-screen rule. */
+html:root {
+  --slideshow-height: 70vh;
+  --slideshow-content-top: 70vh;
+}
+
+#slides-container {
+  --slideshow-font: var(--lf-font-body, "Noto Sans", sans-serif);
+  --plate: var(--lf-surface-1, #1b2229);
+  --lf-mb-green: var(--lf-green, #00e054);
+  --lf-mb-ink: var(--lf-green-ink, #06210f);
+  --lf-mb-border: var(--lf-border, #2c3640);
+  --lf-mb-radius: var(--lf-radius, 4px);
+}
+
+/* Overlays use the theme graphite instead of neutral gray */
+#slides-container .backdrop-overlay {
+  background-color: rgba(20, 24, 28, 0.25);
+}
+
+#slides-container .gradient-overlay {
+  background: linear-gradient(
+    130deg,
+    rgba(20, 24, 28, 0.7) 10%,
+    rgba(20, 24, 28, 0.35) 32%,
+    rgba(20, 24, 28, 0) 100%
+  );
+}
+
+#slides-container.layout-plate .gradient-overlay {
+  background: linear-gradient(
+    130deg,
+    rgba(20, 24, 28, 0.3) 10%,
+    rgba(20, 24, 28, 0.12) 34%,
+    rgba(20, 24, 28, 0) 100%
+  );
+}
+
+#slides-container .backdrop,
+#slides-container .backdrop-overlay {
+  border-radius: 0;
+}
+
+/* Text: overview and genres in the theme's editorial style */
+#slides-container .plot {
+  line-height: 1.6;
+  color: rgba(230, 235, 239, 0.82);
+}
+
+#slides-container .genre {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lf-text-muted, #99aabb);
+}
+
+#slides-container .misc-info,
+#slides-container .runTime,
+#slides-container .date {
+  font-family: var(--lf-font-body, "Noto Sans", sans-serif);
+  color: var(--lf-text-muted, #99aabb);
+  font-variant-numeric: tabular-nums;
+}
+
+#slides-container .separator-icon {
+  color: var(--lf-text-faint, #667788);
+}
+
+/* Age rating: outlined chip (same as the details page) */
+#slides-container .age-rating {
+  background: none;
+  border: 1px solid var(--lf-mb-border);
+  border-radius: var(--lf-mb-radius);
+  color: var(--lf-text-muted, #99aabb);
+  font-weight: 500;
+}
+
+/* Buttons: green Play, the rest stay subtle */
+#slides-container .play-button {
+  background: var(--lf-mb-green);
+  color: var(--lf-mb-ink);
+  border-radius: var(--lf-mb-radius);
+  font-family: var(--lf-font-body, "Noto Sans", sans-serif);
+}
+
+#slides-container .play-button:hover {
+  background: #4dff8a;
+}
+
+#slides-container .detail-button,
+#slides-container .favorite-button {
+  background: rgba(20, 24, 28, 0.6);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+#slides-container .detail-button:hover,
+#slides-container .favorite-button:hover {
+  background: rgba(20, 24, 28, 0.85);
+  border-color: var(--lf-mb-green);
+  color: var(--lf-mb-green);
+}
+
+#slides-container.layout-plate .detail-button:hover,
+#slides-container.layout-plate .favorite-button:hover {
+  border-color: var(--lf-mb-green);
+}
+
+/* Favorited: orange, like the heart on the details page */
+#slides-container .favorite-button.favorited {
+  color: var(--lf-orange, #ff8000);
+  border-color: rgba(255, 128, 0, 0.6);
+}
+
+/* Arrows, pause and focus */
+#slides-container .arrow {
+  background: rgba(20, 24, 28, 0.55);
+}
+
+#slides-container .arrow:hover {
+  background: var(--lf-mb-green);
+  color: var(--lf-mb-ink);
+}
+
+#slides-container .pause-button:hover {
+  color: var(--lf-mb-green);
+}
+
+#slides-container .play-button:focus-visible,
+#slides-container .detail-button:focus-visible,
+#slides-container .favorite-button:focus-visible,
+#slides-container .arrow:focus-visible,
+#slides-container .pause-button:focus-visible,
+#slides-container .volume-toggle:focus-visible {
+  outline-color: var(--lf-mb-green);
+}
+
+/* Dots */
+#slides-container .dot.active {
+  background-color: var(--lf-mb-green);
+}
+
+#slides-container.layout-plate .dot.active {
+  background-color: var(--lf-mb-green);
+}
+
+/* Loading bar */
+.bar-loading .progress-bar {
+  background-color: var(--lf-mb-green);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  #slides-container .arrow,
+  #slides-container .play-button,
+  #slides-container .dot {
+    transition: none;
+  }
+}
