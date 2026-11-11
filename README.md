@@ -38,7 +38,7 @@ All colors, spacing, radius and fonts are variables at the top of `letterfin.css
 
 <br>
 
-![Letterfin screenshots](assets/screenshot.jpg)
+![Screenshot Home](home.png)
 
 </details>
 
