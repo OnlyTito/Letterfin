@@ -33,14 +33,36 @@ Titles use [Fraunces](https://fonts.google.com/specimen/Fraunces), loaded from G
 
 All colors, spacing, radius and fonts are variables at the top of `letterfin.css` (`--lf-*`).
 
-<details>
-<summary>Screenshots (desktop and mobile)</summary>
+## Preview
 
-<br>
-
-![Screenshot Home](home.png)
-
-</details>
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Home</strong><br>
+      <img src="assets/home.png" width="100%" alt="Letterfin Home">
+    </td>
+    <td align="center" width="50%">
+      <strong>Home — No Media Bar</strong><br>
+      <img src="assets/home_no_media_bar.jpg" width="100%" alt="Letterfin Home without Media Bar">
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <strong>Login</strong><br>
+      <img src="assets/login.jpg" width="100%" alt="Letterfin Login">
+    </td>
+    <td align="center" width="50%">
+      <strong>Movie Profile</strong><br>
+      <img src="assets/movie_profile.jpg" width="100%" alt="Letterfin Movie Profile">
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <strong>Showcase</strong><br><br>
+      <img src="assets/showcase.gif" width="100%" alt="Letterfin Showcase">
+    </td>
+  </tr>
+</table>
 
 ## Uninstall
 
